@@ -35,18 +35,22 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val catBreeds = RetrofitInstance.api.getListadoRazas()
+                val gatosGitanos = AppApplication.gatoDatabase.gatoDao().getAll()
 
-                catBreeds.forEach { cat ->
-                    println("Raza: ${cat.name}, Origen: ${cat.origin}, Temperamento: ${cat.temperament}")
 
-                    // Convertir a entidad y guardar en la base de datos
-                    val gatoEntity = GatoEntity(
-                        name = cat.name,
-                        origin = cat.origin,
-                        temperament = cat.temperament
-                    )
+                if (gatosGitanos == null ) {
+                    catBreeds.take(10).forEach { cat ->
+                        println("Raza: ${cat.name}, Origen: ${cat.origin}, Temperamento: ${cat.temperament}")
 
-                    AppApplication.gatoDatabase.gatoDao().insertOne(gatoEntity)
+                        // Convertir a entidad y guardar en la base de datos
+                        val gatoEntity = GatoEntity(
+                            name = cat.name,
+                            origin = cat.origin,
+                            temperament = cat.temperament
+                        )
+
+                        AppApplication.gatoDatabase.gatoDao().insertOne(gatoEntity)
+                    }
                 }
 
                 println("Datos guardados en la base de datos.")
